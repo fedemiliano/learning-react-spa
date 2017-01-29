@@ -6,11 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
 class Error extends Component {
-
-  constructor(props) {  
-    super(props);
-  }  
-
+  
   render() {
     const {dialogError, closeError} = this.props
 

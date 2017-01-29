@@ -21,10 +21,11 @@ import TrashPage from './components/trash/TrashPage';
 
 import { syncHistoryWithStore} from 'react-router-redux'
 
-
 store.dispatch(actions.startListeningToAuth());
 
 const history = syncHistoryWithStore(browserHistory, store)
+
+console.log(history)
 
 ReactDOM.render(
   <Provider store={store}>

@@ -1,5 +1,4 @@
 const platform = require('platform');
-//import axios from 'axios'
 
 class Global {
     constructor() {

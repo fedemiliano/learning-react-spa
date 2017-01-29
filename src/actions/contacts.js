@@ -1,4 +1,4 @@
-import {firebaseApp} from './firebase';
+import {firebaseApp} from '../firebase';
 import {browserHistory } from 'react-router'
 
 function fetchAllContacts() {

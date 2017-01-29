@@ -1,4 +1,4 @@
-import {firebaseApp} from './firebase';
+import {firebaseApp} from '../firebase';
 import * as actionsTasks from './tasks'
 //const Firebase = require('firebase');
 

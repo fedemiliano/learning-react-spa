@@ -1,4 +1,4 @@
-import {firebaseApp} from './firebase';
+import {firebaseApp} from '../firebase';
 import {browserHistory } from 'react-router'
 import Global from '../global'
 const Firebase = require('firebase');
@@ -23,6 +23,9 @@ function onlineOffline(uid) {
 let usr = JSON.parse(localStorage.getItem("usr"))
 if(usr != null) {
   onlineOffline(usr.uid)
+  if(window.location.pathname === '/login' ||
+     window.location.pathname === '/register')
+     browserHistory.push('/dashboard')
 }
 
 function startListeningToAuth() {

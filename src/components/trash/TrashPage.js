@@ -17,7 +17,7 @@ class TrashPage extends Component {
   }
 
   render() {
-    const { trash, removeTrash } = this.props;
+    const { trash, removeTrash, restoreTrash } = this.props;
 
     const containerStyle = {
       position: 'fixed',
@@ -37,8 +37,9 @@ class TrashPage extends Component {
 
     return (
       <div>
-        <div style={containerStyle}>    
+        <div style={containerStyle}>
             <RaisedButton onTouchTap={removeTrash} style={buttonStyle} color={darkBlack} label="Vaciar" primary={true} />
+            <RaisedButton onTouchTap={restoreTrash} style={buttonStyle} color={darkBlack} label="Restaurar" primary={true} />            
             <DialogError />
         </div>
         <TrashList trash={trash} />
@@ -49,14 +50,17 @@ class TrashPage extends Component {
 
 TrashPage.propTypes = {
   trash: PropTypes.object.isRequired,
+  events: PropTypes.object.isRequired,
   fetchAllTrash: PropTypes.func.isRequired,
   showError: PropTypes.func.isRequired,
-  removeTrash: PropTypes.func.isRequired
+  removeTrash: PropTypes.func.isRequired,
+  restoreTrash: PropTypes.func.isRequired
 }
 
 function mapStateToProps(state, props) {
   return {    
-    trash: state.trash
+    trash: state.trash,
+    events: state.events
   };
 }
 

@@ -2,31 +2,19 @@ import { initialState } from '../store/initialState';
 
 export default function usersReducer(state = initialState.users, action) {
   let val = null
-  let newUsers = []
   switch(action.type) {
     case 'RECEIVE_ALL_USERS':
-      for(let user in action.users)
-        if(action.users[user].uid !== action.uid)
-          newUsers.push(action.users[user])
-      val = {data: newUsers}
-      console.log(val)
+      delete action.users[action.uid]
+      val = action.users
       break
-    case 'ADD_USER':
-      newUsers = state.data
-      if(newUsers.length === 0) {
-        newUsers.push(action.user)
-      } else {
-        let isNew = true
-        newUsers.forEach(data => {
-          if(data.uid === action.user.uid)
-            isNew = false 
-        })
-        if(isNew)
-          newUsers.push(action.user)
-      }
-      val = {data: newUsers}      
-      break;   
-   
+
+    case 'USER_ADDED':
+      val = {...state, ...action.user}
+      break;  
+    case 'USER_CHANGED':
+      val = {...state, ...action.user}
+      break;         
+    /*   
     case 'USER_CHANGED':
       state.data.forEach(data => {
         if(data.uid === action.user.data.uid && !action.user.data.connections) {
@@ -42,33 +30,27 @@ export default function usersReducer(state = initialState.users, action) {
       })
       val = {data: newUsers}
       break;    
-  
+  */
     case 'USER_MESSAGES':
-      state.data.forEach(val => {
-        if(val.uid === action.fromUid) {
-          val['messageKey'] = action.messageKey
-          val['toRead'] = action.toRead
-          val['fromUid'] = action.fromUid
-        }
-      })
-      val = {data: state.data}
+      state[action.fromUid] = Object.assign({}, state[action.fromUid], 
+                                            {messageKey: action.messageKey, 
+                                             toRead: action.toRead,
+                                            fromUid: action.fromUid})
+      val = state
       break; 
     case 'NEW_MESSAGES':
-      state.data.forEach(data => {
-        if(data.messageKey === action.messageKey) {
-          data['toRead'] = action.toRead
-          newUsers.push(data)
-        } else {
-          newUsers.push(data)
-        }            
+      Object.keys(state).map((key, index)  => {
+        if(action.messageKey === state[key].messageKey)
+          state[key] = Object.assign({}, state[key], {toRead: action.toRead})
+        return {}
       })
-      val = {data: newUsers}      
+      val = state
       break;
+    /*
     case 'LOGOUT':
-      console.log('USERS-LOGOUT')
-      val = {data: []}
-      console.log(val)
-      break;           
+      state = initialState.users
+      break;
+    */           
     default:
       val = state;
   };

@@ -2,7 +2,8 @@
 
 You can see this project alive at (users registration is without validation) <https://learning-react-spa.firebaseapp.com/>
 
-
+#### Project builder
+1. [Create React App](https://github.com/facebookincubator/create-react-app)
 
 #### You must follow the next steps:
 
@@ -16,15 +17,16 @@ You can see this project alive at (users registration is without validation) <ht
 1. [Redux Chrome Extension](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
 
 #### Todo list
-- [ ] Chat
 - [ ] Negociations
 - [ ] Cases
 - [x] Tasks Crud
 - [x] Contacts Tasks Crud
 - [x] Contacts Crud
+- [x] Trash with undo
 - [ ] Image profile for user/contact
 - [ ] Implement multi company/users
 - [ ] Add filters
 - [x] Users authentication
 - [ ] Multi theming
 - [ ] Apply i18n
+- [ ] Testing

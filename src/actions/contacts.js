@@ -1,16 +1,48 @@
 import {firebaseApp} from '../firebase';
 import {browserHistory } from 'react-router'
 
+/*
+  return (dispatch, getState) => {
+    if(Object.keys(getState().trash).length  === 0) {
+      let fbTrash = firebaseApp.database().ref('trash/'+getState().auth.uid);
+      fbTrash.on('child_added', (result) => {        
+        dispatch({
+          type: 'ADDED_TRASH',
+          trashItem: {[result.key]:result.val()}
+        });
+      }) 
+      fbTrash.on('child_removed', (result) => {        
+        dispatch({
+          type: 'REMOVED_TRASH',
+          itemKey: result.key
+        });                           
+      })         
+    }
+  }
+*/
+
 function fetchAllContacts() {
   return (dispatch, getState) => {
-    if(getState().auth.uid) {
-      let firebaseContacts = firebaseApp.database().ref('public-contacts');
-      firebaseContacts.on('value', (result) => {  
+    if(Object.keys(getState().contacts).length  === 0) {
+      let fbContacts = firebaseApp.database().ref('public-contacts');
+      fbContacts.on('child_added', (result) =>         
         dispatch({
-          type: 'RECEIVE_ALL_CONTACTS',
-          contacts: result.val() ? result.val() : {}
-        });
-      })
+          type: 'CONTACT_ADDED',
+          item: {[result.key]:result.val()}
+        })
+      ) 
+      fbContacts.on('child_removed', (result) =>        
+        dispatch({
+          type: 'CONTACT_REMOVED',
+          itemKey: result.key
+        })                           
+      )
+      fbContacts.on('child_changed', (result) =>         
+        dispatch({
+          type: 'CONTACT_CHANGED',
+          item: {[result.key]:result.val()}
+        })                           
+      )                  
     }    
   }
 }
@@ -25,8 +57,9 @@ function addContact(contactData) {
       firebaseContacts.push(contactData).then((data) => {
         dispatch({
           type: 'OPEN_SNACK',
-          message: "Se ha creado usuario!"
+          message: "Se ha creado el contacto!"
         })
+        dispatch(back())
       })
       .catch(error => {
         console.log("Error saving contact: ", error);
@@ -48,12 +81,13 @@ function updateContact(contact) {
     if(user) {
       let firebaseContacts = firebaseApp.database().ref('public-contacts/'+contact.key);
       delete contact.key
-      firebaseContacts.set(contact).then(() => 
+      firebaseContacts.set(contact).then(() => {
         dispatch({
           type: 'OPEN_SNACK',
           message: "Usuario actualizado!"
-        })      
-      )
+        })  
+        dispatch(back())    
+      })
       .catch(error => {
         console.log("Error saving contact: ", error);
       });
@@ -87,7 +121,7 @@ function removeContact(contact) {
       firebaseApp.database().ref('public-contacts/'+contact.key).remove().then(() =>
         dispatch({
           type: 'OPEN_SNACK',
-          message: "Usuario eliminado!"
+          message: "Contacto eliminado!"
         })       
       )
   }

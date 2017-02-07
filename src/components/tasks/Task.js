@@ -4,22 +4,54 @@ import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 import {grey400} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
+import Chip from 'material-ui/Chip';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actionsDialog from '../../actions/dialogs/tasks';
 import * as actionsTasks from '../../actions/tasks';
-import {DateTimeFormat, getHours} from '../../common'
+// import {DateTimeFormat, getHours} from '../../common'
+
+const style = {
+  expandMore: {
+    padding: 0, 
+    height: 38
+  },
+  checkBox: {
+    top: 6
+  },
+  innerDiv: {
+    paddingTop: 10, 
+    paddingBottom: 10, 
+    paddingLeft: 50, 
+    marginRight:-8
+  },
+  chip: {
+    borderRaious: 8, 
+    display: 'inline', 
+    float:'right'
+  },
+  chipLabel: {
+    padding: 8, 
+    lineHeight: 0
+  },
+  listItem: {
+    marginLeft: -10
+  },
+  divider: {
+    marginLeft: 40
+  }
+}
 
 
 const iconButtonElement = (
   <IconButton
+    style={style.expandMore}
     touch={true}
-    tooltipPosition="bottom-left"
   >
-    <MoreVertIcon color={grey400} />
+    <NavigationExpandMoreIcon color={grey400} />
   </IconButton>
 );
 
@@ -43,7 +75,8 @@ class Task extends Component {
   }
 
   render() {
-    const {task, removeTask, routing} = this.props
+    const {task, removeTask} = this.props
+    /*
     let secondaryText = ""
     secondaryText += new DateTimeFormat('es-ES', {
         day: 'numeric',
@@ -52,7 +85,7 @@ class Task extends Component {
       }).format(task.timeLimit) + " (" + getHours(new Date(task.timeLimit)) + ")"
     if(task.associatedTo && routing.locationBeforeTransitions.pathname === '/tasks')
       secondaryText += ', asignado a:' + task.associatedTo.name + ' ' + task.associatedTo.lastName
-  
+    */  
     const rightIconMenu = (
       <IconMenu iconButtonElement={iconButtonElement}>
         <MenuItem onTouchTap={this.changeTask}>Modificar</MenuItem>
@@ -62,12 +95,13 @@ class Task extends Component {
     return(
       <div className="col-xs-12 start-xs">
         <ListItem
-          leftCheckbox={<Checkbox checked={task.timeFinished?true:false} onCheck={this.handleCheck}/>}
-          primaryText={task.description}
-          secondaryText={secondaryText}
+          leftCheckbox={<Checkbox style={style.checkBox} checked={task.timeFinished?true:false} onCheck={this.handleCheck}/>}
+          innerDivStyle={style.innerDiv}
+          primaryText={<div><label>{task.description}</label><Chip labelStyle={style.chipLabel} style={style.chip}>prueba</Chip></div>}
           rightIconButton={rightIconMenu}
+          style={style.listItem}
         />  
-        <Divider inset={true} />   
+        <Divider style={style.divider}/>   
       </div>
     )
   }

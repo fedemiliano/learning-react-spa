@@ -7,21 +7,33 @@ import { bindActionCreators } from 'redux';
 class Snack extends Component {
 
   render() {
-    const { snack, close } = this.props;
+    const { snack, close, undo } = this.props
+    console.log("snack.data")
+    const keys = Object.keys(snack.data)
     return (
+      keys.length === 0 ?         
         <Snackbar
           open={snack.open}
           message={snack.message}
           autoHideDuration={3000}
           onRequestClose={close}
-        />
+        />:
+        <Snackbar
+          open={snack.open}
+          message={snack.message}
+          autoHideDuration={3000}
+          onRequestClose={close}
+          action="DESHACER"
+          onActionTouchTap={undo}
+        />      
     )
   }
 }
 
 Snack.propTypes = {
   snack: PropTypes.object.isRequired,
-  close: PropTypes.func.isRequired  
+  close: PropTypes.func.isRequired,
+  undo: PropTypes.func.isRequired
 };
 
 const mapStateToProps = (state) => {

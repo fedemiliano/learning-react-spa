@@ -19,7 +19,7 @@ import UsersPage from './components/users/UsersPage';
 import TasksPage from './components/tasks/TasksPage';
 import TrashPage from './components/trash/TrashPage';
 
-import { syncHistoryWithStore} from 'react-router-redux'
+import {syncHistoryWithStore} from 'react-router-redux'
 
 store.dispatch(actions.startListeningToAuth());
 

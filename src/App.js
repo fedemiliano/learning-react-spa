@@ -5,7 +5,6 @@ import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
 import MenuIcon from 'material-ui/svg-icons/navigation/menu';
-import ChatIcon from 'material-ui/svg-icons/communication/chat';
 import Snack from './components/snackbars/Snack'
 import { connect } from 'react-redux'
 import { Link } from 'react-router'
@@ -17,12 +16,10 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {openLeft: false, openRight: false}
+    this.state = {open: false}
   }  
 
-  handleToggleLeft = () => this.setState({openLeft: !this.state.openLeft});
-
-  handleToggleRight = () => this.setState({openRight: !this.state.openRight});
+  handleToggle = () => this.setState({open: !this.state.open});
 
   render() {
 
@@ -34,37 +31,27 @@ class App extends Component {
       zIndex: 5,
     }
      
-    const {username} = this.props;
+    const {auth} = this.props;
 
     return (
-
         <Theme>
           <div>
             <AppBar style={toolBarStyle} 
                     className="appBar" 
-                    iconElementLeft={this.state.openLeft ?
+                    iconElementLeft={this.state.open ?
                                     <IconButton><CloseIcon/></IconButton>:
                                     <IconButton><MenuIcon/></IconButton>} 
-                    onLeftIconButtonTouchTap={this.handleToggleLeft} 
+                    onLeftIconButtonTouchTap={this.handleToggle} 
                     title="React SPA" 
-                    iconElementRight={this.state.openRight ?
-                                    <IconButton><CloseIcon/></IconButton>:
-                                    <IconButton><ChatIcon/></IconButton>}
-                    onRightIconButtonTouchTap={this.handleToggleRight} 
             />
-            <Snack />
-            <Drawer open={this.state.openLeft} containerStyle={{zIndex: 4, marginTop: 50}}>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText={"Bienvenido @"+username}/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Totales"/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Contactos" containerElement={<Link to="/contacts" />}/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Tareas" containerElement={<Link to="/tasks" />}/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Negociaciones"/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Casos"/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Usuarios" containerElement={<Link to="/users" />}/>
-              <MenuItem onTouchTap={this.handleToggleLeft} primaryText="Papelera" containerElement={<Link to="/trash" />}/>
+            <Snack store={this.props.store}/>
+            <Drawer open={this.state.open} containerStyle={{zIndex: 4, marginTop: 50}}>
+              <MenuItem onTouchTap={this.handleToggle} primaryText={"Bienvenido @" + auth.username}/>
+              <MenuItem onTouchTap={this.handleToggle} primaryText="Contactos" containerElement={<Link to="/contacts" />}/>
+              <MenuItem onTouchTap={this.handleToggle} primaryText="Tareas" containerElement={<Link to="/tasks" />}/>
+              <MenuItem onTouchTap={this.handleToggle} primaryText="Usuarios" containerElement={<Link to="/users" />}/>
+              <MenuItem onTouchTap={this.handleToggle} primaryText="Papelera" containerElement={<Link to="/trash" />}/>
               <MenuItem primaryText="Salir" containerElement={<Link to="/logout" />}/>
-            </Drawer>
-            <Drawer open={this.state.openRight} openSecondary={true} containerStyle={{zIndex: 4, marginTop: 50}}>
             </Drawer>
             <div style={{zIndex: -1}}>{this.props.children}</div>
           </div>
@@ -73,7 +60,11 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => state.auth;
+function mapStateToProps(state, props) {
+  return {    
+    auth: state.auth
+  };
+}
 
-export default connect(mapStateToProps, null)(App);
+export default connect(mapStateToProps)(App);
 

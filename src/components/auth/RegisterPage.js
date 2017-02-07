@@ -9,6 +9,10 @@ import Theme from '../../Theme'
 
 class RegisterPage extends Component {
 
+  componentWillMount() {
+    this.props.redirectLoggedIn()
+  }
+
   handleSubmit = (e) => {
     e.preventDefault()
     const name = document.getElementById('name');    

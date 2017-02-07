@@ -1,116 +1,122 @@
 import {firebaseApp} from '../firebase';
 import * as actionsTasks from './tasks'
-//const Firebase = require('firebase');
 
 function fetchAllTrash() {
-  console.log("fetchAllTrash()")
   return (dispatch, getState) => {
-    if(getState().auth.uid) {
-      if(Object.keys(getState().trash).length  === 0) {
-        let fbTrash = firebaseApp.database().ref('trash/'+getState().auth.uid);
-        fbTrash.on('child_added', (result) => {        
-          let trash = {}
-          trash[result.key] = result.val()
-          dispatch({
-            type: 'ADDED_TRASH',
-            trashItem: trash
-          });
-        }) 
-        fbTrash.on('child_removed', (result) => {        
-          let trash = {}
-          trash[result.key] = result.val()
-          dispatch({
-            type: 'REMOVED_TRASH',
-            trashItem: trash
-          });
-        })         
-      }
-    }
-  }    
-}
-
-function removeTrashItem(trashItem, from = 'page') {
-  return (dispatch, getState) => {
-    console.log("remove trash item!!")
-    console.log(trashItem)
-    console.log(getState().auth)
-    if(getState().auth.uid) {
-      console.log('trash/'+getState().auth.uid+'/'+trashItem.key)
-      firebaseApp.database().ref('trash/'+getState().auth.uid+'/'+trashItem.key).remove().then(() => {
-        let msg 
-        if(trashItem.dropped.type === 'task' && from === 'page')
-          msg = "Tarea eliminada!"
-        else
-          msg = "Tarea restaurada!"
-        dispatch({
-          type: 'OPEN_SNACK',
-          message: msg
-        })
-      })
-      .catch(error => 
-        console.log(error) 
-      )
-    }
-  }    
-}
-
-function restoreTrashItem(trashItem) {
-  return (dispatch, getState) => {
-    console.log("restore trash item!!")
-    console.log(trashItem)
-    if(getState().auth.uid) {
-      dispatch(removeTrashItem(trashItem, "restore"))
-      if(trashItem.dropped.type === 'task') {
-        dispatch(actionsTasks.create(trashItem))
-      }
-    }
-  }    
-}
-
-function removeTrash() {
-  return (dispatch, getState) => {
-    console.log("remove trash!!")
-    dispatch({
-      type: 'OPEN_DIALOG_ERROR',
-      message: "Debe seleccionar al menos 1 item."
-    });
-
-    /*
-    if(getState().auth.uid) {
+    if(Object.keys(getState().trash).length  === 0) {
       let fbTrash = firebaseApp.database().ref('trash/'+getState().auth.uid);
       fbTrash.on('child_added', (result) => {        
-        let trash = {}
-        trash[result.key] = result.val()
         dispatch({
           type: 'ADDED_TRASH',
-          trashItem: trash
+          trashItem: {[result.key]:result.val()}
         });
       }) 
+      fbTrash.on('child_removed', (result) => {        
+        dispatch({
+          type: 'REMOVED_TRASH',
+          itemKey: result.key
+        });                           
+      })         
     }
-    */
   }    
 }
 
-function toCheck(trashItem, checked) {
-  console.log(trashItem)
+function removeTrashItems(trashItems, from = 'remove') {
+  return (dispatch, getState) => {
+    let updates = {}
+    let data = {}
+    let itemsState = {'trash': []}
+    Object.keys(trashItems).forEach( key => {
+      let trashItem = trashItems[key]
+      if(trashItem.checked)
+        delete trashItem['checked']
+      updates['trash/'+getState().auth.uid+'/'+key] = null
+      data['trash/'+getState().auth.uid+'/'+key] = trashItem 
+      itemsState['trash'].push(key)
+    })
+    let total = Object.keys(updates).length  
+    firebaseApp.database().ref().update(updates).then(() => {
+      let msg
+      if(from === 'remove') {
+        msg = total === 1 ? "Item eliminado" : total + " items eliminados"
+        dispatch({
+          type: 'OPEN_SNACK',
+          message: msg, 
+          data: data,
+          items: itemsState
+        })        
+      } else if(from === 'restore') {
+        msg = total === 1 ? "Item restaurado" : total + " items restaurados"        
+        dispatch({
+          type: 'OPEN_SNACK',
+          message: msg,
+          items: itemsState
+        })
+      }
+    }).catch( error => 
+      console.log(error)
+    )
+  }    
+}
+
+function restoreTrashItems(trashItems) {
+  return (dispatch, getState) => {
+    dispatch(removeTrashItems(trashItems, "restore"))
+    Object.keys(trashItems).forEach( (key, index) => {
+      let item = trashItems[key]
+      if(item.dropped.type === 'task') 
+        dispatch(actionsTasks.create(item))
+    })
+  }    
+}
+
+function removeTrash(from='remove') {
+  return (dispatch, getState) => {
+    let trash = getState().trash
+    let toDrop = {}
+    Object.keys(trash).forEach( (key, index) => {
+      if(trash[key].checked) {
+        toDrop[key] = trash[key]
+      }     
+    })
+    let keys = Object.keys(toDrop)
+    let total = keys.length
+    if(total === 0) {
+      dispatch({
+        type: 'OPEN_DIALOG_ERROR',
+        message: "Debe seleccionar al menos 1 item."
+      })
+    } else {
+      if(from === 'restore')
+        dispatch(restoreTrashItems(toDrop))
+      else
+        dispatch(removeTrashItems(toDrop))
+    }
+  }    
+}
+
+function restoreTrash() {
+  return (dispatch, getState) =>
+    dispatch(removeTrash('restore'))
+}
+   
+
+
+function toCheck(itemKey, checked) {
+  console.log(itemKey)
   return (dispatch, getState) => {
     if(checked)
-      dispatch({
-        type: 'CHECK_ITEM_TRASH',
-        trashItem: trashItem
-      })
+      dispatch({type: 'CHECK_ITEM_TRASH', itemKey: itemKey})
     else
-      dispatch({
-        type: 'UNCHECK_ITEM_TRASH',
-        trashItem: trashItem
-      }) 
+      dispatch({type: 'UNCHECK_ITEM_TRASH', itemKey: itemKey})
   }  
 }
 
 export {
   fetchAllTrash,
-  removeTrashItem,
+  removeTrashItems,
   removeTrash,
-  restoreTrashItem,
+  restoreTrash,
+  restoreTrashItems,
   toCheck
 }

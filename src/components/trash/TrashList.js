@@ -12,7 +12,7 @@ class TrashList extends Component {
           <div style={{marginTop: 100}} className="row">
             <List style={{width:'100%'}}>
             {Object.keys(trash).map((key, index) => 
-                <Trash key={key} trash={Object.assign({},trash[key], {trashKey: key})}/>           
+                trash[key] ? <Trash itemKey={key} key={key} item={trash[key]}/> : ''           
             )}
             </List>
           </div>

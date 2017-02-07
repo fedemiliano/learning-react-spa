@@ -5,18 +5,51 @@ import Divider from 'material-ui/Divider';
 import Checkbox from 'material-ui/Checkbox';
 import {grey400} from 'material-ui/styles/colors';
 import IconButton from 'material-ui/IconButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import NavigationExpandMoreIcon from 'material-ui/svg-icons/navigation/expand-more';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
+import Chip from 'material-ui/Chip';
+
+
+const style = {
+  expandMore: {
+    padding: 0, 
+    height: 38
+  },
+  checkBox: {
+    top: 6
+  },
+  innerDiv: {
+    paddingTop: 10, 
+    paddingBottom: 10, 
+    paddingLeft: 50, 
+    marginRight:-8
+  },
+  chip: {
+    borderRaious: 8, 
+    display: 'inline', 
+    float:'right'
+  },
+  chipLabel: {
+    padding: 8, 
+    lineHeight: 0
+  },
+  listItem: {
+    marginLeft: -10
+  },
+  divider: {
+    marginLeft: 40
+  }
+}
 
 const iconButtonElement = (
   <IconButton
+    style={style.expandMore}
     touch={true}
-    tooltipPosition="bottom-left"
   >
-    <MoreVertIcon color={grey400} />
+    <NavigationExpandMoreIcon color={grey400} />
   </IconButton>
 );
 
@@ -66,19 +99,20 @@ class Contact extends Component {
     return(
       <div className="col-xs-12 start-xs">
       <ListItem
-        leftCheckbox={<Checkbox />}
-        primaryText={contact.name + " " + contact.lastName}
-        secondaryText={secondaryText}
+        leftCheckbox={<Checkbox style={style.checkBox} />}
+        innerDivStyle={style.innerDiv}
+        primaryText={<div><label>{contact.name + " " + contact.lastName}</label><Chip labelStyle={style.chipLabel} style={style.chip}>prueba</Chip></div>}
         rightIconButton={rightIconMenu}
+        style={style.listItem}
       />  
-      <Divider inset={true} />   
+      <Divider style={style.divider} />   
       <Dialog
         actions={actions}
         modal={false}
         open={this.state.open}
         onRequestClose={this.handleClose}
       >
-        ¿Quieres eliminar al usuairo {contact.name}?
+        ¿Quieres eliminar al usuario {contact.name}?
       </Dialog>          
       </div>
     )

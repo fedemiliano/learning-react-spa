@@ -8,20 +8,26 @@ function create(task) {
                                     timeCreated: Firebase.database.ServerValue.TIMESTAMP})
 
     console.log(task)
-    if(task.dropped)
+    let fromTrash = false
+    if(task.dropped) {
+      fromTrash = true
       delete task['dropped']
+    }
+      
 
     db.ref('tasks').push(task).then((data) => {
-      dispatch({
-        type: 'CLOSE_DIALOG_TASK'
-      })      
-      dispatch({
-        type: 'OPEN_SNACK',
-        message: "Se ha creado una tarea!"
-      })
-      dispatch({
-        type: 'NEW_TASK'
-      })  
+      if(!fromTrash) {
+        dispatch({
+          type: 'CLOSE_DIALOG_TASK'
+        })      
+        dispatch({
+          type: 'OPEN_SNACK',
+          message: "Se ha creado una tarea!"
+        })
+        dispatch({
+          type: 'NEW_TASK'
+        }) 
+      } 
       if(task.associatedTo) {
         db.ref('contact-tasks/'+task.associatedTo.key+'/'+data.key).set(task)
         .catch(error => {
@@ -151,7 +157,7 @@ function removeTask(task) {
       delete user['status']
       delete user['token']
       task['dropped'] = {by: user, time: Firebase.database.ServerValue.TIMESTAMP, type: 'task'}
-      firebaseApp.database().ref('trash/'+getState().auth.uid).push(task)
+      firebaseApp.database().ref('trash/'+getState().auth.uid+'/'+task.key).set(task)
       .catch(error => {
       console.log("Error removing task: ", error);
     });

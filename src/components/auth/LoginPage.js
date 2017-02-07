@@ -11,6 +11,10 @@ import Theme from '../../Theme'
 
 class LoginPage extends Component {
 
+  componentWillMount() {
+    this.props.redirectLoggedIn()
+  }
+
   handleSubmit = (e) => {
     e.preventDefault()
     const email = document.getElementById('email');

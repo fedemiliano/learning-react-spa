@@ -22,11 +22,9 @@ class UsersPage extends Component {
   }
 
   render() {
-   const { users, changeUser, removeUser } = this.props;
+   const { users } = this.props;
     return (
-      <div>
-        <UsersList users={users} changeUser={changeUser} removeUser={removeUser} />
-      </div>
+      <UsersList users={users} />
     )
   }
 }
@@ -34,9 +32,7 @@ class UsersPage extends Component {
 UsersPage.propTypes = {
   users: PropTypes.object.isRequired,
   fetchAllUsers: PropTypes.func.isRequired,
-  addUser: PropTypes.func.isRequired, 
-  changeUser: PropTypes.func.isRequired,
-  removeUser: PropTypes.func.isRequired
+  addUser: PropTypes.func.isRequired,
 }
 
 function mapStateToProps(state, props) {

@@ -7,14 +7,14 @@ export const initialState = {
     token: null,
     alerts: []
   },
-  users: {
-    data: []
-  },
+  users: {},
   contacts: {},
   contact: {},
   snack: {
     open: false,
-    message: ""
+    message: "",
+    data: {},
+    items: {}
   },
   dialogTask: {
     open: false,
@@ -30,12 +30,5 @@ export const initialState = {
   contactTasks: {},
   task: {},  
   trash: {},
-  messages: {
-    key: null,
-    toUsername: null,
-    toOnline: null,
-    toUid: null,
-    toVisiting: false,
-    data: []
-  }
+  events:{}
 };

@@ -20,13 +20,17 @@ function onlineOffline(uid) {
   })
 }
 
-let usr = JSON.parse(localStorage.getItem("usr"))
-if(usr != null) {
-  onlineOffline(usr.uid)
-  if(window.location.pathname === '/login' ||
-     window.location.pathname === '/register')
-     browserHistory.push('/dashboard')
+function redirectLoggedIn() {
+  return(dispatch, state) => {
+    let usr = JSON.parse(localStorage.getItem("usr"))
+    if(usr != null) {
+      onlineOffline(usr.uid)
+      browserHistory.push('/dashboard')
+    }
+  }
 }
+
+
 
 function startListeningToAuth() {
   return (dispatch, getState) => {
@@ -36,21 +40,20 @@ function startListeningToAuth() {
         type: 'START',
         email: usr.email,
         uid: usr.uid,
-        token: usr.token,
         username: usr.username
       });    
     firebase.auth().onAuthStateChanged(authData => {
       if (authData) { 
         let usr = JSON.parse(localStorage.getItem("usr"))
         if(usr) {
-          //onlineOffline(usr.uid)          
+          onlineOffline(usr.uid)          
           dispatch({
             type: 'LOGIN',
             email: usr.email,
             username: usr.username,
-            uid: usr.uid,
-            token: usr.token
+            uid: usr.uid
           });
+
         }    
 
         //browserHistory.push('/');
@@ -120,30 +123,28 @@ function logIn(email, pw) {
     });
     firebase.auth().signInWithEmailAndPassword(email, pw)
     .then(result => {
-        let user = firebase.auth().currentUser;
-        user.getToken(/* forceRefresh */ true).then(function(idToken) {
-          firebase.database().ref('users/'+user.uid).on('value', value => {
-            let usr = JSON.stringify({uid: result.uid, token: idToken, email: result.email, username: value.val().username})
-            localStorage.setItem("usr", usr);  
-            dispatch({
-                  type: 'LOGIN',
-                  uid: result.uid,
-                  email: result.email,
-                  token: idToken,
-                  username: value.val().username
-            });               
-          })
-      }); 
-      let code = Global.platform.description.replace(/\./g, '@');
-      code = code.replace(/\//g, '=');
-      if(Global.incognito)
-          code += '_incognito'
-      firebase.database().ref('presence/'+user.uid+'/connections/'+code).push(true).onDisconnect().remove()
-      firebase.database().ref('presence/'+user.uid+'/lastOnline').onDisconnect().set(Firebase.database.ServerValue.TIMESTAMP)  
-      console.log('Sign in successful!')   
-      //TODO
-                
-      browserHistory.push('/dashboard');  
+        browserHistory.push('/dashboard');  
+        dispatch({
+              type: 'LOGIN',
+              uid: result.uid,
+              email: result.email
+        });        
+        firebase.database().ref('users/'+result.uid).on('value', value => {
+          //TODO: Get user's company
+          let username = value.val().username
+          let usr = JSON.stringify({uid: result.uid, email: result.email, username: username})
+          localStorage.setItem("usr", usr);  
+          dispatch({
+                type: 'LOGIN_DETAILS',
+                username: value.val().username
+          });                           
+        }); 
+        let code = Global.platform.description.replace(/\./g, '@');
+        code = code.replace(/\//g, '=');
+        if(Global.incognito)
+            code += '_incognito'
+        firebase.database().ref('presence/'+result.uid+'/connections/'+code).push(true).onDisconnect().remove()
+        firebase.database().ref('presence/'+result.uid+'/lastOnline').onDisconnect().set(Firebase.database.ServerValue.TIMESTAMP)  
     })
     .catch(error => {
       console.log('Error logging in: ', error);
@@ -166,7 +167,10 @@ function logOut() {
         dispatch({
           type: 'LOGOUT',
           token: null
-        });              
+        });
+        dispatch({
+          type: 'RESTORE'
+        });                      
         console.log('Sign out successful!')
         browserHistory.push('/');  
       })
@@ -181,5 +185,6 @@ export {
   startListeningToAuth,
   logIn,
   logOut,
-  register
+  register,
+  redirectLoggedIn
 };

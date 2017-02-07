@@ -7,22 +7,26 @@ export default function trashReducer(state = initialState.trash, action) {
       val = action.trash
       break;
     case 'ADDED_TRASH':
-      val = Object.assign({}, state, action.trashItem)
+      val = {...state, ...action.trashItem}
       break;
     case 'REMOVED_TRASH':
-      console.log(action.trashItem)
-      let copy = Object.assign({}, state)
-      delete copy[Object.keys(action.trashItem)[0]] 
-      val = copy
+      state[action.itemKey] = null 
+      val = {...state}
       break;
+    case 'REMOVE_TRASH_KEYS':
+      let copy = {...state}
+      action.keys.forEach(key => {
+        delete copy[key]
+      })      
+      val = copy  
+      break;    
     case 'CHECK_ITEM_TRASH':
-      console.log(action.trashItem)
-      let trashItem = Object.assign({}, state[action.trashItem.trashKey], {checked: true})
-      state[action.trashItem.trashKey] = trashItem
+      let trashItem = Object.assign({}, state[action.itemKey], {checked: true})
+      state[action.itemKey] = trashItem
       val = state
       break;
     case 'UNCHECK_ITEM_TRASH':
-      delete state[action.trashItem.trashKey].checked
+      delete state[action.itemKey].checked
       val = state
       break;            
     default:

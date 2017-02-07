@@ -25,6 +25,8 @@ class TasksPage extends Component {
   render() {
     const { tasks, associatedTo, contactTasks } = this.props;
 
+    console.log("TasksPage.render()")
+
     const containerStyle = {
       position: 'fixed',
       top: associatedTo ? 0 : 50,

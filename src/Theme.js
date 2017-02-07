@@ -8,6 +8,7 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 injectTapEventPlugin();
 
 export default class Theme extends Component {
+
     render() {
         let theme = process.env.NODE_ENV === "development" ? fedeBaseTheme : lightBaseTheme;
         return(            

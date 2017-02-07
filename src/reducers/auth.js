@@ -22,17 +22,14 @@ export default function authReducer(state = initialState.auth, action) {
         status: 'REGISTERED',
         email: action.email,
         uid: action.uid,
-        username: action.username,
-        token: action.token
+        username: action.username
       };
     break;        
     case 'LOGOUT':
-      console.log('AUTH-LOGOUT')
       val = {
         status: 'ANONYMOUS',
         email: 'guest',
-        uid: null,
-        token: action.token
+        uid: null
       };
       break;
     case 'LOGIN':
@@ -40,17 +37,18 @@ export default function authReducer(state = initialState.auth, action) {
         status: 'LOGGED_IN',
         email: action.email,
         uid: action.uid,
-        username: action.username,
-        token: action.token
+        username: action.username
       };
       break;
+    case 'LOGIN_DETAILS':
+      val = Object.assign({}, state, {username: action.username})
+      break;      
     case 'START':
       val = {
         status: 'STARTED',
         email: action.email,
         uid: action.uid,
-        username: action.username,
-        token: action.token
+        username: action.username
       };
       break;      
     default: 
